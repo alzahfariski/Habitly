@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary Reference: 0xFF6BCF9B
   static const Color primary50 = Color(0xFFE9F7F1);
   static const Color primary100 = Color(0xFFC9EBDD);
   static const Color primary200 = Color(0xFFA8DFC9);
@@ -13,7 +12,6 @@ class AppColors {
   static const Color primary800 = Color(0xFF207751);
   static const Color primary900 = Color(0xFF105F3E);
 
-  // Neutral Reference: 0xFF6B7280
   static const Color neutral50 = Color(0xFFF9FAFB);
   static const Color neutral100 = Color(0xFFF3F4F6);
   static const Color neutral200 = Color(0xFFE5E7EB);
@@ -25,7 +23,6 @@ class AppColors {
   static const Color neutral800 = Color(0xFF1F2937);
   static const Color neutral900 = Color(0xFF111827);
 
-  // Success Reference: 0xFF22C55E
   static const Color success50 = Color(0xFFEAFBF1);
   static const Color success100 = Color(0xFFCFF3DD);
   static const Color success200 = Color(0xFFB3EBC9);
@@ -37,7 +34,6 @@ class AppColors {
   static const Color success800 = Color(0xFF166534);
   static const Color success900 = Color(0xFF14532D);
 
-  // Info Reference: 0xFF14B8A6
   static const Color info50 = Color(0xFFE6FAF7);
   static const Color info100 = Color(0xFFC2F0E9);
   static const Color info200 = Color(0xFF9EE6DB);
@@ -49,7 +45,6 @@ class AppColors {
   static const Color info800 = Color(0xFF115E59);
   static const Color info900 = Color(0xFF134E4A);
 
-  // Warning Reference: 0xFFF59E0B
   static const Color warning50 = Color(0xFFFFF7E6);
   static const Color warning100 = Color(0xFFFFEABF);
   static const Color warning200 = Color(0xFFFFDE99);
@@ -61,7 +56,6 @@ class AppColors {
   static const Color warning800 = Color(0xFF92400E);
   static const Color warning900 = Color(0xFF78350F);
 
-  // Danger Reference: 0xFFEF4444
   static const Color danger50 = Color(0xFFFEECEC);
   static const Color danger100 = Color(0xFFFECACA);
   static const Color danger200 = Color(0xFFFCA5A5);
@@ -73,36 +67,30 @@ class AppColors {
   static const Color danger800 = Color(0xFF7F1D1D);
   static const Color danger900 = Color(0xFF450A0A);
 
-  // Aliases
   static const Color success = success500;
   static const Color info = info500;
   static const Color warning = warning500;
   static const Color error = danger500;
 
-  // Background Colors
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
   static const Color background = neutral50;
   static const Color surface = white;
   static const Color scaffoldBackground = neutral100;
 
-  // Text Colors
   static const Color textPrimary = neutral900;
   static const Color textSecondary = neutral600;
   static const Color textDisabled = neutral400;
   static const Color textInverse = white;
 
-  // Button Colors
   static const Color buttonPrimary = primary500;
   static const Color buttonSecondary = neutral200;
   static const Color buttonDisabled = neutral300;
 
-  // Border Colors
   static const Color border = neutral300;
   static const Color borderFocus = primary500;
   static const Color borderError = danger500;
 
-  // Other
   static const Color divider = neutral200;
   static const Color shadow = Color(0x1F000000);
   static const Color overlay = Color(0x80000000);
