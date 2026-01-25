@@ -15,6 +15,18 @@ class AppThemeData {
     onSurface: AppColors.black,
   );
 
+  static const ColorScheme colorSchemeDark = ColorScheme(
+    brightness: Brightness.dark,
+    primary: AppColors.primary500,
+    onPrimary: Colors.white,
+    secondary: AppColors.primary500,
+    onSecondary: Colors.white,
+    error: AppColors.danger500,
+    onError: Colors.white,
+    surface: AppColors.neutral900,
+    onSurface: Colors.white,
+  );
+
   static const TextTheme textTheme = TextTheme(
     displayLarge: AppTextStyles.displayLarge,
     displayMedium: AppTextStyles.displayMedium,

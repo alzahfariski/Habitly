@@ -15,6 +15,8 @@ class App extends StatelessWidget {
       title: 'Habitly',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       initialRoute: AppRoutes.start,
       routes: {
         AppRoutes.start: (context) => const StartPage(),

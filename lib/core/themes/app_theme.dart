@@ -19,4 +19,24 @@ class AppTheme {
       ),
     );
   }
+
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      primaryColor: AppColors.primary500,
+      scaffoldBackgroundColor: AppColors.neutral900,
+      fontFamily: 'Poppins',
+      textTheme: AppThemeData.textTheme.apply(
+        bodyColor: Colors.white,
+        displayColor: Colors.white,
+      ),
+      colorScheme: AppThemeData.colorSchemeDark,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.neutral900,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+    );
+  }
 }
