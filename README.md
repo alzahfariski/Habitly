@@ -6,7 +6,6 @@ Habitly is a modern, elegant habit tracking application built with Flutter. It t
 
 - **Modern & Clean UI**
   - Enhanced Start, Login, and Register pages with beautiful wave designs.
-  - "Hello" Dashboard with profile summary.
 - **Habit Management (CRUD)**
   - **Create**: Add new habits with custom titles, categories, and times.
   - **Read**: View your daily tasks filtered by date using the horizontal calendar.

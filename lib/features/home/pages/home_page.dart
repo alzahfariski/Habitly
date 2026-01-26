@@ -1,78 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_color.dart';
 import '../models/habit_model.dart';
 import '../widgets/add_habit_sheet.dart';
 import '../widgets/habit_card.dart';
 import '../widgets/home_header.dart';
 import '../widgets/horizontal_calendar.dart';
+import '../providers/habit_provider.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  DateTime _selectedDate = DateTime.now();
-
-  // 1. Start with NO Dummy Data
-  final List<HabitModel> _habits = [];
-
-  // Logic to filter habits by selected date
-  List<HabitModel> get _filteredHabits {
-    return _habits.where((h) {
-      return h.date.year == _selectedDate.year &&
-          h.date.month == _selectedDate.month &&
-          h.date.day == _selectedDate.day;
-    }).toList();
-  }
-
-  // 3. Helper to show BottomSheet for Add/Update
-  void _showHabitSheet({HabitModel? habitToEdit}) {
+  void _showHabitSheet(
+    BuildContext context,
+    WidgetRef ref, {
+    HabitModel? habitToEdit,
+  }) {
+    final selectedDate = ref.read(selectedDateProvider);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => AddHabitSheet(
-        initialDate: _selectedDate,
+        initialDate: selectedDate,
         existingHabit: habitToEdit,
         onSave: (habit) {
-          setState(() {
-            if (habitToEdit != null) {
-              // Update Logic
-              final index = _habits.indexWhere((h) => h.id == habit.id);
-              if (index != -1) {
-                _habits[index] = habit;
-              }
-            } else {
-              _habits.add(habit);
-            }
-          });
+          if (habitToEdit != null) {
+            ref.read(habitProvider.notifier).updateHabit(habit);
+          } else {
+            ref.read(habitProvider.notifier).addHabit(habit);
+          }
         },
       ),
     );
   }
 
-  void _deleteHabit(String id) {
-    setState(() {
-      _habits.removeWhere((h) => h.id == id);
-    });
-  }
-
-  void _toggleHabit(HabitModel habit, bool? val) {
-    setState(() {
-      habit.isCompleted = val ?? false;
-      habit.completedAt = habit.isCompleted ? DateTime.now() : null;
-    });
+  void _deleteHabit(BuildContext context, WidgetRef ref, String id) {
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmDialog(
+        title: 'Delete Habit',
+        content: 'Are you sure you want to delete this habit?',
+        onConfirm: () {
+          ref.read(habitProvider.notifier).deleteHabit(id);
+        },
+      ),
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedDate = ref.watch(selectedDateProvider);
+    final filteredHabits = ref.watch(filteredHabitsProvider);
+    final habitState = ref.watch(habitProvider);
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showHabitSheet(),
+        onPressed: () => _showHabitSheet(context, ref),
         backgroundColor: AppColors.primary500,
         child: const Icon(Icons.add),
       ),
@@ -82,11 +68,9 @@ class _HomePageState extends State<HomePage> {
             const HomeHeader(),
 
             HorizontalCalendar(
-              selectedDate: _selectedDate,
+              selectedDate: selectedDate,
               onDateSelected: (date) {
-                setState(() {
-                  _selectedDate = date;
-                });
+                ref.read(selectedDateProvider.notifier).state = date;
               },
             ),
 
@@ -107,7 +91,11 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 16),
 
-                    if (_filteredHabits.isEmpty)
+                    if (habitState.isLoading)
+                      const Expanded(
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (filteredHabits.isEmpty)
                       Expanded(
                         child: Center(
                           child: Column(
@@ -130,14 +118,35 @@ class _HomePageState extends State<HomePage> {
                     else
                       Expanded(
                         child: ListView.builder(
-                          itemCount: _filteredHabits.length,
+                          itemCount: filteredHabits.length,
                           itemBuilder: (context, index) {
-                            final habit = _filteredHabits[index];
+                            final habit = filteredHabits[index];
                             return HabitCard(
                               habit: habit,
-                              onEdit: () => _showHabitSheet(habitToEdit: habit),
-                              onDelete: () => _deleteHabit(habit.id),
-                              onHighlight: (val) => _toggleHabit(habit, val),
+                              onEdit: () => _showHabitSheet(
+                                context,
+                                ref,
+                                habitToEdit: habit,
+                              ),
+                              onDelete: () =>
+                                  _deleteHabit(context, ref, habit.id),
+                              onHighlight: (val) {
+                                final updatedHabit = HabitModel(
+                                  id: habit.id,
+                                  title: habit.title,
+                                  description: habit.description,
+                                  category: habit.category,
+                                  date: habit.date,
+                                  time: habit.time,
+                                  isCompleted: val ?? false,
+                                  completedAt: (val ?? false)
+                                      ? DateTime.now()
+                                      : null,
+                                );
+                                ref
+                                    .read(habitProvider.notifier)
+                                    .updateHabit(updatedHabit);
+                              },
                             );
                           },
                         ),
