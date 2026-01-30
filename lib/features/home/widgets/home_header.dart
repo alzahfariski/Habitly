@@ -12,7 +12,7 @@ class HomeHeader extends StatelessWidget {
         ClipPath(
           clipper: WaveClipper(),
           child: Container(
-            height: 140, // Reduced height
+            height: 140,
             width: double.infinity,
             decoration: const BoxDecoration(
               gradient: LinearGradient(

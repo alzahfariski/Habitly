@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import '../../../../core/services/hive_service.dart';
 import '../models/habit_model.dart';
 
-// State class to hold the list of habits and loading status
 class HabitState {
   final List<HabitModel> habits;
   final bool isLoading;
@@ -41,8 +41,18 @@ class HabitNotifier extends StateNotifier<HabitState> {
 
   Future<void> addHabit(HabitModel habit) async {
     try {
-      await HiveService.addHabit(habit);
-      final updatedHabits = [...state.habits, habit];
+      final newHabit = HabitModel(
+        id: const Uuid().v4(),
+        title: habit.title,
+        description: habit.description,
+        category: habit.category,
+        date: habit.date,
+        time: habit.time,
+        isCompleted: habit.isCompleted,
+        completedAt: habit.completedAt,
+      );
+      await HiveService.addHabit(newHabit);
+      final updatedHabits = [...state.habits, newHabit];
       state = state.copyWith(habits: updatedHabits);
     } catch (e) {
       state = state.copyWith(error: e.toString());
@@ -56,6 +66,24 @@ class HabitNotifier extends StateNotifier<HabitState> {
         return h.id == habit.id ? habit : h;
       }).toList();
       state = state.copyWith(habits: updatedHabits);
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+    }
+  }
+
+  Future<void> toggleHabitCompletion(HabitModel habit, bool isCompleted) async {
+    try {
+      final updatedHabit = HabitModel(
+        id: habit.id,
+        title: habit.title,
+        description: habit.description,
+        category: habit.category,
+        date: habit.date,
+        time: habit.time,
+        isCompleted: isCompleted,
+        completedAt: isCompleted ? DateTime.now() : null,
+      );
+      await updateHabit(updatedHabit);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }

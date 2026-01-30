@@ -131,21 +131,9 @@ class HomePage extends ConsumerWidget {
                               onDelete: () =>
                                   _deleteHabit(context, ref, habit.id),
                               onHighlight: (val) {
-                                final updatedHabit = HabitModel(
-                                  id: habit.id,
-                                  title: habit.title,
-                                  description: habit.description,
-                                  category: habit.category,
-                                  date: habit.date,
-                                  time: habit.time,
-                                  isCompleted: val ?? false,
-                                  completedAt: (val ?? false)
-                                      ? DateTime.now()
-                                      : null,
-                                );
                                 ref
                                     .read(habitProvider.notifier)
-                                    .updateHabit(updatedHabit);
+                                    .toggleHabitCompletion(habit, val ?? false);
                               },
                             );
                           },

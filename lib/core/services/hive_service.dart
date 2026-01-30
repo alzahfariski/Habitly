@@ -6,7 +6,7 @@ class HiveService {
 
   static Future<void> init() async {
     await Hive.initFlutter();
-    Hive.registerAdapter(HabitModelAdapter());
+    Hive.registerAdapter(HabitAdapter());
     await Hive.openBox<HabitModel>(_habitBoxName);
   }
 
