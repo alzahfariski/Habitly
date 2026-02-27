@@ -9,8 +9,10 @@ class StartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
       body: Stack(
         children: [
           ClipPath(
@@ -40,7 +42,7 @@ class StartPage extends StatelessWidget {
                       Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white,
+                          color: isDark ? AppColors.neutral800 : Colors.white,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withAlpha(32),

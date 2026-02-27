@@ -67,9 +67,9 @@ class HomePage extends ConsumerWidget {
     final selectedDate = ref.watch(selectedDateProvider);
     final filteredHabits = ref.watch(filteredHabitsProvider);
     final habitState = ref.watch(habitProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showHabitSheet(context, ref),
         backgroundColor: AppColors.primary500,
@@ -136,7 +136,9 @@ class HomePage extends ConsumerWidget {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.grey[200],
+                            color: isDark
+                                ? AppColors.neutral800
+                                : Colors.grey[200],
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(
@@ -144,14 +146,18 @@ class HomePage extends ConsumerWidget {
                               Icon(
                                 Icons.sort,
                                 size: 16,
-                                color: Colors.grey[700],
+                                color: isDark
+                                    ? AppColors.neutral400
+                                    : Colors.grey[700],
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 _getSortText(ref.watch(habitSortProvider)),
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey[700],
+                                  color: isDark
+                                      ? AppColors.neutral400
+                                      : Colors.grey[700],
                                 ),
                               ),
                             ],
@@ -182,6 +188,10 @@ class HomePage extends ConsumerWidget {
                                 selected.isBefore(today)) {
                               return false; // No upcoming tasks in the past
                             }
+                            if (status == HabitStatus.upcoming &&
+                                selected.day == today.day) {
+                              return false; // No upcoming tasks in the past
+                            }
                             if (status == HabitStatus.ongoing &&
                                 selected.isAfter(today)) {
                               return false; // No ongoing tasks in the future
@@ -200,7 +210,9 @@ class HomePage extends ConsumerWidget {
                                   style: TextStyle(
                                     color: isActive
                                         ? Colors.white
-                                        : Colors.black87,
+                                        : (isDark
+                                              ? AppColors.neutral300
+                                              : Colors.black87),
                                     fontWeight: isActive
                                         ? FontWeight.bold
                                         : FontWeight.normal,
@@ -208,7 +220,9 @@ class HomePage extends ConsumerWidget {
                                 ),
                                 selected: isActive,
                                 selectedColor: AppColors.primary500,
-                                backgroundColor: Colors.grey[200],
+                                backgroundColor: isDark
+                                    ? AppColors.neutral800
+                                    : Colors.grey[200],
                                 showCheckmark: false,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
@@ -253,12 +267,18 @@ class HomePage extends ConsumerWidget {
                             Icon(
                               Icons.event_note,
                               size: 60,
-                              color: Colors.grey[300],
+                              color: isDark
+                                  ? AppColors.neutral700
+                                  : Colors.grey[300],
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'No tasks for this day',
-                              style: TextStyle(color: Colors.grey[500]),
+                              style: TextStyle(
+                                color: isDark
+                                    ? AppColors.neutral400
+                                    : Colors.grey[500],
+                              ),
                             ),
                           ],
                         ),

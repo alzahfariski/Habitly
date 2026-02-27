@@ -37,15 +37,19 @@ class HabitCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.neutral800 : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withAlpha(10),
+            color: isDark
+                ? Colors.black.withAlpha(50)
+                : Colors.grey.withAlpha(10),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -57,7 +61,7 @@ class HabitCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.primary100.withAlpha(10),
+              color: AppColors.primary500.withAlpha(isDark ? 50 : 25),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
@@ -77,7 +81,7 @@ class HabitCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: isDark ? AppColors.neutral200 : Colors.black87,
                     decoration: habit.isCompleted
                         ? TextDecoration.lineThrough
                         : null,
@@ -86,11 +90,18 @@ class HabitCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.access_time, size: 14, color: Colors.grey[400]),
+                    Icon(
+                      Icons.access_time,
+                      size: 14,
+                      color: isDark ? AppColors.neutral500 : Colors.grey[400],
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       habit.time,
-                      style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? AppColors.neutral400 : Colors.grey[500],
+                      ),
                     ),
                     const SizedBox(width: 8),
                     if (habit.status == HabitStatus.completed)
@@ -165,7 +176,10 @@ class HabitCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(6),
               ),
               activeColor: AppColors.primary500,
-              side: BorderSide(color: Colors.grey.shade300, width: 2),
+              side: BorderSide(
+                color: isDark ? AppColors.neutral600 : Colors.grey.shade300,
+                width: 2,
+              ),
               onChanged: onHighlight,
             ),
           ),
@@ -179,13 +193,16 @@ class HabitCard extends StatelessWidget {
                 onDelete();
               }
             },
-            icon: Icon(Icons.more_vert, color: Colors.grey[400]),
+            icon: Icon(
+              Icons.more_vert,
+              color: isDark ? AppColors.neutral500 : Colors.grey[400],
+            ),
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 'edit',
                 child: Row(
                   children: [
-                    Icon(Icons.edit, size: 20, color: Colors.blue),
+                    Icon(Icons.edit, size: 20, color: AppColors.info500),
                     SizedBox(width: 8),
                     Text('Edit'),
                   ],
@@ -195,7 +212,7 @@ class HabitCard extends StatelessWidget {
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.delete, size: 20, color: Colors.red),
+                    Icon(Icons.delete, size: 20, color: AppColors.danger500),
                     SizedBox(width: 8),
                     Text('Delete'),
                   ],

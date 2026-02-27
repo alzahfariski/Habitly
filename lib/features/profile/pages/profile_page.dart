@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_color.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/wave_clipper.dart';
+import '../../../core/providers/theme_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
@@ -144,6 +145,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (_isLoading) {
       return const Scaffold(
         body: Center(
@@ -153,7 +156,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
       appBar: AppBar(
         backgroundColor: AppColors.primary500,
         elevation: 0,
@@ -187,7 +190,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   top: 10,
                   child: CircleAvatar(
                     radius: 50,
-                    backgroundColor: Colors.white,
+                    backgroundColor: isDark
+                        ? AppColors.neutral800
+                        : Colors.white,
                     child: CircleAvatar(
                       radius: 46,
                       backgroundColor: AppColors.primary200,
@@ -218,22 +223,30 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     TextFormField(
                       initialValue: _email,
                       readOnly: true,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Email',
-                        labelStyle: TextStyle(color: Colors.grey),
+                        labelStyle: TextStyle(
+                          color: isDark ? AppColors.neutral400 : Colors.grey,
+                        ),
                         prefixIcon: Icon(
                           Icons.email_outlined,
-                          color: Colors.grey,
+                          color: isDark ? AppColors.neutral400 : Colors.grey,
                         ),
-                        border: OutlineInputBorder(
+                        border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(12)),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(12)),
-                          borderSide: BorderSide(color: Colors.grey),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(12),
+                          ),
+                          borderSide: BorderSide(
+                            color: isDark ? AppColors.neutral600 : Colors.grey,
+                          ),
                         ),
                         filled: true,
-                        fillColor: Color(0xFFF5F5F5),
+                        fillColor: isDark
+                            ? AppColors.neutral800
+                            : const Color(0xFFF5F5F5),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -340,6 +353,51 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         setState(() {
                           _selectedGender = newValue;
                         });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Theme Mode
+                    DropdownButtonFormField<ThemeMode>(
+                      initialValue: ref.watch(themeProvider),
+                      decoration: const InputDecoration(
+                        labelText: 'Theme Mode',
+                        labelStyle: TextStyle(color: AppColors.primary600),
+                        prefixIcon: Icon(Icons.brightness_6),
+                        prefixIconColor: AppColors.primary600,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                          borderSide: BorderSide(color: AppColors.primary500),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                          borderSide: BorderSide(
+                            color: AppColors.primary600,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: ThemeMode.system,
+                          child: Text('System'),
+                        ),
+                        DropdownMenuItem(
+                          value: ThemeMode.light,
+                          child: Text('Light'),
+                        ),
+                        DropdownMenuItem(
+                          value: ThemeMode.dark,
+                          child: Text('Dark'),
+                        ),
+                      ],
+                      onChanged: (ThemeMode? newValue) {
+                        if (newValue != null) {
+                          ref.read(themeProvider.notifier).setTheme(newValue);
+                        }
                       },
                     ),
                     const SizedBox(height: 32),

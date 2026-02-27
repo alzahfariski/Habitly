@@ -30,6 +30,7 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final startDate = today.subtract(Duration(days: _daysBefore));
     final totalDays = _daysBefore + 1 + _daysAfter;
 
@@ -50,12 +51,14 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
             child: Container(
               width: 60,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary500 : Colors.white,
+                color: isSelected
+                    ? AppColors.primary500
+                    : (isDark ? AppColors.neutral800 : Colors.white),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isSelected
                       ? AppColors.primary500
-                      : Colors.grey.shade200,
+                      : (isDark ? AppColors.neutral700 : Colors.grey.shade200),
                 ),
                 boxShadow: isSelected
                     ? [
@@ -75,7 +78,9 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: isSelected ? Colors.white70 : Colors.grey,
+                      color: isSelected
+                          ? Colors.white70
+                          : (isDark ? AppColors.neutral400 : Colors.grey),
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -84,7 +89,9 @@ class _HorizontalCalendarState extends State<HorizontalCalendar> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: isSelected ? Colors.white : Colors.black87,
+                      color: isSelected
+                          ? Colors.white
+                          : (isDark ? AppColors.neutral200 : Colors.black87),
                     ),
                   ),
                   if (isToday && !isSelected)

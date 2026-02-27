@@ -58,8 +58,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -87,7 +89,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        color: isDark ? AppColors.neutral800 : Colors.white,
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withAlpha(32),
@@ -206,7 +208,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
                             'OR',
-                            style: TextStyle(color: Colors.grey[600]),
+                            style: TextStyle(
+                              color: isDark
+                                  ? AppColors.neutral400
+                                  : Colors.grey[600],
+                            ),
                           ),
                         ),
                         const Expanded(child: Divider()),
@@ -221,13 +227,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         'assets/icons/Logo-google.png',
                         width: 20,
                       ),
-                      label: const Text(
+                      label: Text(
                         'Login with Google',
-                        style: TextStyle(color: Colors.black87),
+                        style: TextStyle(
+                          color: isDark ? AppColors.neutral200 : Colors.black87,
+                        ),
                       ),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: BorderSide(color: Colors.grey[300]!),
+                        side: BorderSide(
+                          color: isDark
+                              ? AppColors.neutral700
+                              : Colors.grey[300]!,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -240,13 +252,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         'assets/icons/Logo-apple.png',
                         width: 20,
                       ),
-                      label: const Text(
+                      label: Text(
                         'Login with Apple',
-                        style: TextStyle(color: Colors.black87),
+                        style: TextStyle(
+                          color: isDark ? AppColors.neutral200 : Colors.black87,
+                        ),
                       ),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: BorderSide(color: Colors.grey[300]!),
+                        side: BorderSide(
+                          color: isDark
+                              ? AppColors.neutral700
+                              : Colors.grey[300]!,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -256,7 +274,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     const SizedBox(height: 48),
                     Text(
                       'By clicking continue, you agree to our Terms of Service\nand Privacy Policy',
-                      style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                      style: TextStyle(
+                        color: isDark ? AppColors.neutral400 : Colors.grey[500],
+                        fontSize: 12,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),

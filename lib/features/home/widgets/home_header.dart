@@ -12,6 +12,7 @@ class HomeHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
     final userName = authState.value?.displayName ?? 'User';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Stack(
       children: [
@@ -61,8 +62,8 @@ class HomeHeader extends ConsumerWidget {
                   onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
                   child: Container(
                     padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.neutral800 : Colors.white,
                       shape: BoxShape.circle,
                     ),
                     child: const CircleAvatar(

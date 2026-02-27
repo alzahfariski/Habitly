@@ -99,10 +99,12 @@ class _AddHabitSheetState extends State<AddHabitSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.neutral900 : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -126,7 +128,7 @@ class _AddHabitSheetState extends State<AddHabitSheet> {
             decoration: InputDecoration(
               hintText: 'What is your goal?',
               filled: true,
-              fillColor: Colors.grey[100],
+              fillColor: isDark ? AppColors.neutral800 : Colors.grey[100],
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -175,7 +177,9 @@ class _AddHabitSheetState extends State<AddHabitSheet> {
                                   : FontWeight.normal,
                               color: isSelected
                                   ? AppColors.primary600
-                                  : Colors.black87,
+                                  : (isDark
+                                        ? AppColors.neutral300
+                                        : Colors.black87),
                             ),
                           ),
                         ],
@@ -190,10 +194,15 @@ class _AddHabitSheetState extends State<AddHabitSheet> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.grey[200],
+                          color: isDark
+                              ? AppColors.neutral800
+                              : Colors.grey[200],
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.add, color: Colors.grey),
+                        child: Icon(
+                          Icons.add,
+                          color: isDark ? AppColors.neutral400 : Colors.grey,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       const Text('Add', style: TextStyle(fontSize: 12)),
@@ -221,16 +230,22 @@ class _AddHabitSheetState extends State<AddHabitSheet> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: isDark ? AppColors.neutral800 : Colors.grey[100],
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.access_time, color: Colors.grey),
+                  Icon(
+                    Icons.access_time,
+                    color: isDark ? AppColors.neutral400 : Colors.grey,
+                  ),
                   const SizedBox(width: 12),
                   Text(_selectedTime, style: const TextStyle(fontSize: 16)),
                   const Spacer(),
-                  const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                  Icon(
+                    Icons.arrow_drop_down,
+                    color: isDark ? AppColors.neutral400 : Colors.grey,
+                  ),
                 ],
               ),
             ),

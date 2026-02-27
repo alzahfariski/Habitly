@@ -72,8 +72,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.neutral900 : Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -101,7 +103,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        color: isDark ? AppColors.neutral800 : Colors.white,
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withAlpha(32),
@@ -342,7 +344,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
                             'OR',
-                            style: TextStyle(color: Colors.grey[600]),
+                            style: TextStyle(
+                              color: isDark
+                                  ? AppColors.neutral400
+                                  : Colors.grey[600],
+                            ),
                           ),
                         ),
                         const Expanded(child: Divider()),
@@ -357,13 +363,19 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         'assets/icons/Logo-google.png',
                         width: 20,
                       ),
-                      label: const Text(
+                      label: Text(
                         'Login with Google',
-                        style: TextStyle(color: Colors.black87),
+                        style: TextStyle(
+                          color: isDark ? AppColors.neutral200 : Colors.black87,
+                        ),
                       ),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: BorderSide(color: Colors.grey[300]!),
+                        side: BorderSide(
+                          color: isDark
+                              ? AppColors.neutral700
+                              : Colors.grey[300]!,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -376,13 +388,19 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         'assets/icons/Logo-apple.png',
                         width: 20,
                       ),
-                      label: const Text(
+                      label: Text(
                         'Login with Apple',
-                        style: TextStyle(color: Colors.black87),
+                        style: TextStyle(
+                          color: isDark ? AppColors.neutral200 : Colors.black87,
+                        ),
                       ),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: BorderSide(color: Colors.grey[300]!),
+                        side: BorderSide(
+                          color: isDark
+                              ? AppColors.neutral700
+                              : Colors.grey[300]!,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
