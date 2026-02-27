@@ -10,8 +10,14 @@ class HomeHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final userProfileAsync = ref.watch(userProfileProvider);
     final authState = ref.watch(authStateProvider);
-    final userName = authState.value?.displayName ?? 'User';
+
+    final userName = userProfileAsync.maybeWhen(
+      data: (profile) =>
+          profile?['name'] ?? authState.value?.displayName ?? 'User',
+      orElse: () => authState.value?.displayName ?? 'User',
+    );
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Stack(
@@ -37,27 +43,31 @@ class HomeHeader extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Hello, $userName',
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hello, $userName',
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Your daily goals',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white.withAlpha(230),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Your daily goals',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white.withAlpha(230),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 12),
                 GestureDetector(
                   onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
                   child: Container(
