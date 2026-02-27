@@ -12,6 +12,19 @@ import '../../../core/widgets/confirm_dialog.dart';
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
+  String _getSortText(HabitSortConfig config) {
+    switch (config) {
+      case HabitSortConfig.timeAsc:
+        return 'Earliest first';
+      case HabitSortConfig.timeDesc:
+        return 'Latest first';
+      case HabitSortConfig.nameAsc:
+        return 'Name (A-Z)';
+      case HabitSortConfig.nameDesc:
+        return 'Name (Z-A)';
+    }
+  }
+
   void _showHabitSheet(
     BuildContext context,
     WidgetRef ref, {
@@ -81,9 +94,149 @@ class HomePage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Today\'s Tasks',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Today\'s Tasks',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      PopupMenuButton<HabitSortConfig>(
+                        offset: const Offset(0, 40),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        onSelected: (config) {
+                          ref.read(habitSortProvider.notifier).state = config;
+                        },
+                        itemBuilder: (context) => const [
+                          PopupMenuItem(
+                            value: HabitSortConfig.timeAsc,
+                            child: Text('Time (Earliest first)'),
+                          ),
+                          PopupMenuItem(
+                            value: HabitSortConfig.timeDesc,
+                            child: Text('Time (Latest first)'),
+                          ),
+                          PopupMenuItem(
+                            value: HabitSortConfig.nameAsc,
+                            child: Text('Name (A-Z)'),
+                          ),
+                          PopupMenuItem(
+                            value: HabitSortConfig.nameDesc,
+                            child: Text('Name (Z-A)'),
+                          ),
+                        ],
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.sort,
+                                size: 16,
+                                color: Colors.grey[700],
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _getSortText(ref.watch(habitSortProvider)),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: HabitStatus.values
+                          .where((status) {
+                            final now = DateTime.now();
+                            final today = DateTime(
+                              now.year,
+                              now.month,
+                              now.day,
+                            );
+                            final selected = DateTime(
+                              selectedDate.year,
+                              selectedDate.month,
+                              selectedDate.day,
+                            );
+
+                            if (status == HabitStatus.upcoming &&
+                                selected.isBefore(today)) {
+                              return false; // No upcoming tasks in the past
+                            }
+                            if (status == HabitStatus.ongoing &&
+                                selected.isAfter(today)) {
+                              return false; // No ongoing tasks in the future
+                            }
+                            return true;
+                          })
+                          .map((status) {
+                            final isActive =
+                                ref.watch(habitFilterProvider) == status;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: FilterChip(
+                                label: Text(
+                                  status.name.substring(0, 1).toUpperCase() +
+                                      status.name.substring(1),
+                                  style: TextStyle(
+                                    color: isActive
+                                        ? Colors.white
+                                        : Colors.black87,
+                                    fontWeight: isActive
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                                selected: isActive,
+                                selectedColor: AppColors.primary500,
+                                backgroundColor: Colors.grey[200],
+                                showCheckmark: false,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  side: BorderSide(
+                                    color: isActive
+                                        ? AppColors.primary500
+                                        : Colors.transparent,
+                                  ),
+                                ),
+                                onSelected: (isSelected) {
+                                  if (isSelected) {
+                                    ref
+                                            .read(habitFilterProvider.notifier)
+                                            .state =
+                                        status;
+                                  } else if (status != HabitStatus.all) {
+                                    // If unselecting a specific filter, default back to 'all'
+                                    ref
+                                            .read(habitFilterProvider.notifier)
+                                            .state =
+                                        HabitStatus.all;
+                                  }
+                                },
+                              ),
+                            );
+                          })
+                          .toList(),
+                    ),
                   ),
                   const SizedBox(height: 16),
 

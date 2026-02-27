@@ -92,15 +92,15 @@ class HabitCard extends StatelessWidget {
                       habit.time,
                       style: TextStyle(fontSize: 13, color: Colors.grey[500]),
                     ),
-                    if (habit.isCompleted) ...[
-                      const SizedBox(width: 8),
+                    const SizedBox(width: 8),
+                    if (habit.status == HabitStatus.completed)
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 6,
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.green.withAlpha(10),
+                          color: Colors.green.withAlpha(20),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Text(
@@ -111,8 +111,45 @@ class HabitCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                      )
+                    else if (habit.status == HabitStatus.ongoing)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withAlpha(20),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'Ongoing',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.orange,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                    else if (habit.status == HabitStatus.upcoming)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withAlpha(20),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'Upcoming',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ],
                   ],
                 ),
               ],

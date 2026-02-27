@@ -130,13 +130,63 @@ final habitProvider = StateNotifierProvider<HabitNotifier, HabitState>((ref) {
 
 final selectedDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
+enum HabitSortConfig { timeAsc, timeDesc, nameAsc, nameDesc }
+
+final habitFilterProvider = StateProvider<HabitStatus>(
+  (ref) => HabitStatus.all,
+);
+final habitSortProvider = StateProvider<HabitSortConfig>(
+  (ref) => HabitSortConfig.timeAsc,
+);
+
 final filteredHabitsProvider = Provider<List<HabitModel>>((ref) {
   final habitState = ref.watch(habitProvider);
   final selectedDate = ref.watch(selectedDateProvider);
+  final filter = ref.watch(habitFilterProvider);
+  final sortConfig = ref.watch(habitSortProvider);
 
-  return habitState.habits.where((h) {
-    return h.date.year == selectedDate.year &&
+  var filtered = habitState.habits.where((h) {
+    final matchesDate =
+        h.date.year == selectedDate.year &&
         h.date.month == selectedDate.month &&
         h.date.day == selectedDate.day;
+
+    if (!matchesDate) return false;
+    if (filter == HabitStatus.all) return true;
+
+    return h.status == filter;
   }).toList();
+
+  filtered.sort((a, b) {
+    switch (sortConfig) {
+      case HabitSortConfig.timeAsc:
+        return _compareTime(a.time, b.time);
+      case HabitSortConfig.timeDesc:
+        return _compareTime(b.time, a.time);
+      case HabitSortConfig.nameAsc:
+        return a.title.compareTo(b.title);
+      case HabitSortConfig.nameDesc:
+        return b.title.compareTo(a.title);
+    }
+  });
+
+  return filtered;
 });
+
+int _compareTime(String time1, String time2) {
+  int getMinutes(String time) {
+    try {
+      if (!time.contains(':')) return 0;
+      final parts = time.split(':');
+      int h = int.tryParse(parts[0]) ?? 0;
+      int m = int.tryParse(parts[1].split(' ')[0]) ?? 0;
+      if (time.toLowerCase().contains('pm') && h < 12) h += 12;
+      if (time.toLowerCase().contains('am') && h == 12) h = 0;
+      return h * 60 + m;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  return getMinutes(time1).compareTo(getMinutes(time2));
+}

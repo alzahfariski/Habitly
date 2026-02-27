@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+enum HabitStatus { all, upcoming, ongoing, completed }
+
 class HabitModel {
   final String id;
   String title;
@@ -20,6 +22,54 @@ class HabitModel {
     required this.time,
     this.completedAt,
   });
+
+  HabitStatus get status {
+    if (isCompleted) return HabitStatus.completed;
+
+    final now = DateTime.now();
+    int hour = 0;
+    int minute = 0;
+
+    try {
+      if (time.contains(':')) {
+        final parts = time.split(':');
+        hour = int.tryParse(parts[0]) ?? 0;
+        final minutePart = parts[1].split(' ')[0];
+        minute = int.tryParse(minutePart) ?? 0;
+
+        if (time.toLowerCase().contains('pm') && hour < 12) {
+          hour += 12;
+        } else if (time.toLowerCase().contains('am') && hour == 12) {
+          hour = 0;
+        }
+      }
+    } catch (e) {
+      // Fallback
+    }
+
+    final today = DateTime(now.year, now.month, now.day);
+    final habitDateOnly = DateTime(date.year, date.month, date.day);
+
+    if (habitDateOnly.isBefore(today)) {
+      return HabitStatus.ongoing; // Past missed habits are ongoing
+    } else if (habitDateOnly.isAfter(today)) {
+      return HabitStatus.upcoming; // Future habits are upcoming
+    }
+
+    final habitDateTime = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      hour,
+      minute,
+    );
+
+    if (habitDateTime.isAfter(now)) {
+      return HabitStatus.upcoming;
+    } else {
+      return HabitStatus.ongoing;
+    }
+  }
 
   /// Convert to Firestore-compatible map
   Map<String, dynamic> toMap() {
