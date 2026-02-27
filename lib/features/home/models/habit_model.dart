@@ -1,4 +1,4 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HabitModel {
   final String id;
@@ -20,59 +20,33 @@ class HabitModel {
     required this.time,
     this.completedAt,
   });
-}
 
-class HabitAdapter extends TypeAdapter<HabitModel> {
-  @override
-  final int typeId = 0;
-
-  @override
-  HabitModel read(BinaryReader reader) {
-    final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{
-      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+  /// Convert to Firestore-compatible map
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'description': description,
+      'isCompleted': isCompleted,
+      'category': category,
+      'date': Timestamp.fromDate(date),
+      'time': time,
+      'completedAt': completedAt != null
+          ? Timestamp.fromDate(completedAt!)
+          : null,
     };
+  }
+
+  /// Create HabitModel from Firestore document
+  factory HabitModel.fromMap(Map<String, dynamic> map, String id) {
     return HabitModel(
-      id: fields[0] as String,
-      title: fields[1] as String,
-      description: fields[2] as String,
-      isCompleted: fields[3] as bool,
-      category: fields[4] as String,
-      date: fields[5] as DateTime,
-      time: fields[6] as String,
-      completedAt: fields[7] as DateTime?,
+      id: id,
+      title: map['title'] as String? ?? '',
+      description: map['description'] as String? ?? '',
+      isCompleted: map['isCompleted'] as bool? ?? false,
+      category: map['category'] as String? ?? '',
+      date: (map['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      time: map['time'] as String? ?? '',
+      completedAt: (map['completedAt'] as Timestamp?)?.toDate(),
     );
   }
-
-  @override
-  void write(BinaryWriter writer, HabitModel obj) {
-    writer
-      ..writeByte(8)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.title)
-      ..writeByte(2)
-      ..write(obj.description)
-      ..writeByte(3)
-      ..write(obj.isCompleted)
-      ..writeByte(4)
-      ..write(obj.category)
-      ..writeByte(5)
-      ..write(obj.date)
-      ..writeByte(6)
-      ..write(obj.time)
-      ..writeByte(7)
-      ..write(obj.completedAt);
-  }
-
-  @override
-  int get hashCode => typeId.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is HabitAdapter &&
-          runtimeType == other.runtimeType &&
-          typeId == other.typeId;
 }

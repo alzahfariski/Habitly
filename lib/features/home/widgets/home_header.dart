@@ -1,18 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_color.dart';
 import '../../../core/widgets/wave_clipper.dart';
+import '../../auth/providers/auth_provider.dart';
 
-class HomeHeader extends StatelessWidget {
+class HomeHeader extends ConsumerWidget {
   const HomeHeader({super.key});
 
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final authService = ref.read(authServiceProvider);
+              await authService.signOut();
+            },
+            child: const Text('Logout', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+    final userName = authState.valueOrNull?.displayName ?? 'User';
+
     return Stack(
       children: [
         ClipPath(
           clipper: WaveClipper(),
           child: Container(
-            height: 140,
+            height: 200,
             width: double.infinity,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -33,9 +62,9 @@ class HomeHeader extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Hello,',
-                      style: TextStyle(
+                    Text(
+                      'Hello, $userName',
+                      style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -51,19 +80,22 @@ class HomeHeader extends StatelessWidget {
                     ),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const CircleAvatar(
-                    radius: 24,
-                    backgroundColor: AppColors.primary200,
-                    child: Icon(
-                      Icons.person,
-                      size: 28,
-                      color: AppColors.primary600,
+                GestureDetector(
+                  onTap: () => _showLogoutDialog(context, ref),
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const CircleAvatar(
+                      radius: 24,
+                      backgroundColor: AppColors.primary200,
+                      child: Icon(
+                        Icons.person,
+                        size: 28,
+                        color: AppColors.primary600,
+                      ),
                     ),
                   ),
                 ),

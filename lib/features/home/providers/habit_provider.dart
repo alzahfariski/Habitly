@@ -1,7 +1,14 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
-import '../../../../core/services/hive_service.dart';
+import '../../../core/services/firestore_service.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../models/habit_model.dart';
+
+/// Singleton instance of FirestoreService
+final firestoreServiceProvider = Provider<FirestoreService>((ref) {
+  return FirestoreService();
+});
 
 class HabitState {
   final List<HabitModel> habits;
@@ -23,20 +30,28 @@ class HabitState {
   }
 }
 
-// Notifier class to manage the state
+/// Notifier class to manage the habit state using Firestore
 class HabitNotifier extends StateNotifier<HabitState> {
-  HabitNotifier() : super(HabitState()) {
-    loadHabits();
+  final FirestoreService _firestoreService;
+  final String _uid;
+  StreamSubscription? _subscription;
+
+  HabitNotifier(this._firestoreService, this._uid) : super(HabitState()) {
+    _listenToHabits();
   }
 
-  void loadHabits() {
+  void _listenToHabits() {
     state = state.copyWith(isLoading: true);
-    try {
-      final habits = HiveService.getHabits();
-      state = state.copyWith(habits: habits, isLoading: false);
-    } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-    }
+    _subscription = _firestoreService
+        .getHabitsStream(_uid)
+        .listen(
+          (habits) {
+            state = state.copyWith(habits: habits, isLoading: false);
+          },
+          onError: (e) {
+            state = state.copyWith(isLoading: false, error: e.toString());
+          },
+        );
   }
 
   Future<void> addHabit(HabitModel habit) async {
@@ -51,9 +66,8 @@ class HabitNotifier extends StateNotifier<HabitState> {
         isCompleted: habit.isCompleted,
         completedAt: habit.completedAt,
       );
-      await HiveService.addHabit(newHabit);
-      final updatedHabits = [...state.habits, newHabit];
-      state = state.copyWith(habits: updatedHabits);
+      await _firestoreService.addHabit(_uid, newHabit);
+      // No need to manually update state — Firestore stream will handle it
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
@@ -61,11 +75,7 @@ class HabitNotifier extends StateNotifier<HabitState> {
 
   Future<void> updateHabit(HabitModel habit) async {
     try {
-      await HiveService.updateHabit(habit);
-      final updatedHabits = state.habits.map((h) {
-        return h.id == habit.id ? habit : h;
-      }).toList();
-      state = state.copyWith(habits: updatedHabits);
+      await _firestoreService.updateHabit(_uid, habit);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
@@ -83,7 +93,7 @@ class HabitNotifier extends StateNotifier<HabitState> {
         isCompleted: isCompleted,
         completedAt: isCompleted ? DateTime.now() : null,
       );
-      await updateHabit(updatedHabit);
+      await _firestoreService.updateHabit(_uid, updatedHabit);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
@@ -91,18 +101,25 @@ class HabitNotifier extends StateNotifier<HabitState> {
 
   Future<void> deleteHabit(String id) async {
     try {
-      await HiveService.deleteHabit(id);
-      final updatedHabits = state.habits.where((h) => h.id != id).toList();
-      state = state.copyWith(habits: updatedHabits);
+      await _firestoreService.deleteHabit(_uid, id);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
   }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
 }
 
-// Global Providers
+/// Habit provider that depends on the authenticated user's UID
 final habitProvider = StateNotifierProvider<HabitNotifier, HabitState>((ref) {
-  return HabitNotifier();
+  final authState = ref.watch(authStateProvider);
+  final uid = authState.valueOrNull?.uid ?? '';
+  final firestoreService = ref.watch(firestoreServiceProvider);
+  return HabitNotifier(firestoreService, uid);
 });
 
 final selectedDateProvider = StateProvider<DateTime>((ref) => DateTime.now());

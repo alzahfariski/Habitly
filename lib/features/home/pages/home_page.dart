@@ -62,89 +62,84 @@ class HomePage extends ConsumerWidget {
         backgroundColor: AppColors.primary500,
         child: const Icon(Icons.add),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            const HomeHeader(),
+      body: Column(
+        children: [
+          const HomeHeader(),
 
-            HorizontalCalendar(
-              selectedDate: selectedDate,
-              onDateSelected: (date) {
-                ref.read(selectedDateProvider.notifier).state = date;
-              },
-            ),
+          HorizontalCalendar(
+            selectedDate: selectedDate,
+            onDateSelected: (date) {
+              ref.read(selectedDateProvider.notifier).state = date;
+            },
+          ),
 
-            const SizedBox(height: 24),
+          const SizedBox(height: 24),
 
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Today\'s Tasks',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Today\'s Tasks',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+
+                  if (habitState.isLoading)
+                    const Expanded(
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (filteredHabits.isEmpty)
+                    Expanded(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.event_note,
+                              size: 60,
+                              color: Colors.grey[300],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No tasks for this day',
+                              style: TextStyle(color: Colors.grey[500]),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: filteredHabits.length,
+                        itemBuilder: (context, index) {
+                          final habit = filteredHabits[index];
+                          return HabitCard(
+                            habit: habit,
+                            onEdit: () => _showHabitSheet(
+                              context,
+                              ref,
+                              habitToEdit: habit,
+                            ),
+                            onDelete: () =>
+                                _deleteHabit(context, ref, habit.id),
+                            onHighlight: (val) {
+                              ref
+                                  .read(habitProvider.notifier)
+                                  .toggleHabitCompletion(habit, val ?? false);
+                            },
+                          );
+                        },
                       ),
                     ),
-                    const SizedBox(height: 16),
-
-                    if (habitState.isLoading)
-                      const Expanded(
-                        child: Center(child: CircularProgressIndicator()),
-                      )
-                    else if (filteredHabits.isEmpty)
-                      Expanded(
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.event_note,
-                                size: 60,
-                                color: Colors.grey[300],
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'No tasks for this day',
-                                style: TextStyle(color: Colors.grey[500]),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    else
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: filteredHabits.length,
-                          itemBuilder: (context, index) {
-                            final habit = filteredHabits[index];
-                            return HabitCard(
-                              habit: habit,
-                              onEdit: () => _showHabitSheet(
-                                context,
-                                ref,
-                                habitToEdit: habit,
-                              ),
-                              onDelete: () =>
-                                  _deleteHabit(context, ref, habit.id),
-                              onHighlight: (val) {
-                                ref
-                                    .read(habitProvider.notifier)
-                                    .toggleHabitCompletion(habit, val ?? false);
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                  ],
-                ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
