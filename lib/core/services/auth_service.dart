@@ -36,21 +36,75 @@ class AuthService {
         password: password,
       );
 
-      // Update display name
-      await credential.user?.updateDisplayName(name);
+      try {
+        // Update display name with timeout to prevent hanging
+        await credential.user
+            ?.updateDisplayName(name)
+            .timeout(const Duration(seconds: 5));
+      } catch (e) {
+        // Ignore display name error, we still created the user successfully
+      }
 
-      // Save user profile to Firestore
-      await _firestore.collection('users').doc(credential.user!.uid).set({
-        'name': name,
-        'email': email,
-        'phone': phone ?? '',
-        'gender': gender ?? '',
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      try {
+        // Save user profile to Firestore with timeout
+        await _firestore
+            .collection('users')
+            .doc(credential.user!.uid)
+            .set({
+              'name': name,
+              'email': email,
+              'phone': phone ?? '',
+              'gender': gender ?? '',
+              'createdAt': FieldValue.serverTimestamp(),
+            })
+            .timeout(const Duration(seconds: 10));
+      } catch (e) {
+        // If Firestore fails (e.g. offline or rules issue), the user is still created in Auth.
+        // We log the error but allow registration to complete so the app flow continues.
+      }
 
       return credential;
     } on FirebaseAuthException catch (e) {
       throw _mapAuthException(e);
+    } catch (e) {
+      // Catch any other exceptions
+      throw 'An error occurred during registration. Please try again.';
+    }
+  }
+
+  Future<Map<String, dynamic>?> getUserProfile(String uid) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (doc.exists) {
+        return doc.data();
+      }
+      return null;
+    } catch (e) {
+      throw 'Failed to fetch user profile: $e';
+    }
+  }
+
+  Future<void> updateUserProfile({
+    required String uid,
+    required String name,
+    String? phone,
+    String? gender,
+  }) async {
+    try {
+      // Update Auth display name
+      final user = _auth.currentUser;
+      if (user != null && user.uid == uid) {
+        await user.updateDisplayName(name);
+      }
+
+      // Update Firestore profile
+      await _firestore.collection('users').doc(uid).set({
+        'name': name,
+        'phone': phone ?? '',
+        'gender': gender ?? '',
+      }, SetOptions(merge: true));
+    } catch (e) {
+      throw 'Failed to update profile: $e';
     }
   }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/services/firestore_service.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -41,6 +42,11 @@ class HabitNotifier extends StateNotifier<HabitState> {
   }
 
   void _listenToHabits() {
+    if (_uid.isEmpty) {
+      state = state.copyWith(isLoading: false, habits: []);
+      return;
+    }
+
     state = state.copyWith(isLoading: true);
     _subscription = _firestoreService
         .getHabitsStream(_uid)
@@ -117,7 +123,7 @@ class HabitNotifier extends StateNotifier<HabitState> {
 /// Habit provider that depends on the authenticated user's UID
 final habitProvider = StateNotifierProvider<HabitNotifier, HabitState>((ref) {
   final authState = ref.watch(authStateProvider);
-  final uid = authState.valueOrNull?.uid ?? '';
+  final uid = authState.value?.uid ?? '';
   final firestoreService = ref.watch(firestoreServiceProvider);
   return HabitNotifier(firestoreService, uid);
 });

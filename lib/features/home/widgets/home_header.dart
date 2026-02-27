@@ -1,40 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_color.dart';
+import '../../../core/constants/app_routes.dart';
 import '../../../core/widgets/wave_clipper.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class HomeHeader extends ConsumerWidget {
   const HomeHeader({super.key});
 
-  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              final authService = ref.read(authServiceProvider);
-              await authService.signOut();
-            },
-            child: const Text('Logout', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
-    final userName = authState.valueOrNull?.displayName ?? 'User';
+    final userName = authState.value?.displayName ?? 'User';
 
     return Stack(
       children: [
@@ -81,7 +58,7 @@ class HomeHeader extends ConsumerWidget {
                   ],
                 ),
                 GestureDetector(
-                  onTap: () => _showLogoutDialog(context, ref),
+                  onTap: () => Navigator.pushNamed(context, AppRoutes.profile),
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(

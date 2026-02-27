@@ -31,7 +31,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         password: _passwordController.text,
       );
       if (mounted) {
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        // Pop back to root route so the auth state stream in app.dart can handle
+        // switching the home page. This avoids stacked routes when logging out later.
+        Navigator.popUntil(context, (route) => route.isFirst);
       }
     } catch (e) {
       if (mounted) {

@@ -114,6 +114,7 @@ class HomePage extends ConsumerWidget {
                   else
                     Expanded(
                       child: ListView.builder(
+                        padding: const EdgeInsets.all(0),
                         itemCount: filteredHabits.length,
                         itemBuilder: (context, index) {
                           final habit = filteredHabits[index];

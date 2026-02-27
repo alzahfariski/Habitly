@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/constants/app_routes.dart';
 import '../../../core/constants/app_color.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/wave_clipper.dart';
@@ -43,7 +42,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Account created successfully!')),
         );
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        // Pop back to root route so the auth state stream in app.dart can handle
+        // switching the home page. This avoids stacked routes when logging out later.
+        Navigator.popUntil(context, (route) => route.isFirst);
       }
     } catch (e) {
       if (mounted) {
