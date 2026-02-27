@@ -5,11 +5,11 @@ Habitly is a modern, elegant habit tracking application built with Flutter. It t
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="image/image.png" width="180">
-  <img src="image/image1.png" width="180">
-  <img src="image/image2.png" width="180">
-  <img src="image/image3.png" width="180">
-  <img src="image/image4.png" width="180">
+  <img src="assets/image/image.png" width="180">
+  <img src="assets/image/image1.png" width="180">
+  <img src="assets/image/image2.png" width="180">
+  <img src="assets/image/image3.png" width="180">
+  <img src="assets/image/image4.png" width="180">
 </p>
 
 ## ✨ Features
