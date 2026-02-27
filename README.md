@@ -20,6 +20,10 @@ Habitly is a modern, elegant habit tracking application built with Flutter. It t
   - Fully adaptable to system theme preferences.
   - Optimized color schemes for both Light and Dark modes.
 
+- **Cloud Sync & Authentication ☁️**
+  - Secure User Authentication powered by **Firebase Auth**.
+  - Cloud data synchronization mapped with **Firebase Firestore**.
+
 ## 🛠 Tech Stack
 
 - **Framework**: Flutter
@@ -27,6 +31,7 @@ Habitly is a modern, elegant habit tracking application built with Flutter. It t
 - **Architecture**: Feature-based folder structure
 - **State Management**: Riverpod (StateNotifier & Provider)
 - **Local Database**: Hive (NoSQL)
+- **Backend**: Firebase (Authentication & Firestore)
 - **Assets**: Custom SVGs & Images
 
 ## 🏗 Architecture & State Management
@@ -46,6 +51,12 @@ We use **Hive** for fast, lightweight, and secure local data storage.
 - **Provider**: `habitProvider` (StateNotifierProvider) manages the list of habits, loading states, and errors.
 - **Logic**: `HabitNotifier` handles business logic (CRUD operations) and updates the UI reactively.
 - **Filtering**: `filteredHabitsProvider` listens to `habitProvider` and `selectedDateProvider` to efficiently filter habits for the selected day without mutating the original list.
+
+## 📥 Try It Out!
+
+Want to experience **Habitly** instantly? You can download the compiled Android APK directly to your device without building from source:
+
+- 📱 **[Download app-release.apk](./app-release.apk)**
 
 ## 🚀 Getting Started
 
