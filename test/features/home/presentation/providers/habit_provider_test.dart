@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:habitly/features/home/domain/entities/habit_entity.dart';
@@ -40,6 +41,9 @@ void main() {
       await Future.delayed(Duration.zero); // Wait for stream to emit
       expect(notifier.state.habits, isEmpty);
       expect(notifier.state.isLoading, isFalse);
+      debugPrint(
+        '✅ [Presentation Test] HabitNotifier starts with empty and is False loading status',
+      );
     });
 
     test(
@@ -59,6 +63,9 @@ void main() {
         await notifier.addHabit(habit);
 
         verify(mockRepository.addHabit('user_123', any)).called(1);
+        debugPrint(
+          '✅ [Presentation Test] HabitNotifier accurately calls repository addHabit function without manual state errors',
+        );
       },
     );
   });

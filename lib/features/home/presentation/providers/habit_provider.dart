@@ -7,6 +7,7 @@ import '../../domain/entities/habit_entity.dart';
 import '../../domain/repositories/habit_repository.dart';
 import '../../data/datasources/habit_remote_data_source.dart';
 import '../../data/repositories/habit_repository_impl.dart';
+import '../../../../core/services/notification_service.dart';
 
 /// Provider for the remote data source
 final habitRemoteDataSourceProvider = Provider<HabitRemoteDataSource>((ref) {
@@ -81,6 +82,7 @@ class HabitNotifier extends StateNotifier<HabitState> {
         completedAt: habit.completedAt,
       );
       await _repository.addHabit(_uid, newHabit);
+      await NotificationService().scheduleHabitReminder(newHabit);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
@@ -89,6 +91,7 @@ class HabitNotifier extends StateNotifier<HabitState> {
   Future<void> updateHabit(HabitEntity habit) async {
     try {
       await _repository.updateHabit(_uid, habit);
+      await NotificationService().scheduleHabitReminder(habit);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
@@ -110,6 +113,12 @@ class HabitNotifier extends StateNotifier<HabitState> {
         completedAt: isCompleted ? DateTime.now() : null,
       );
       await _repository.updateHabit(_uid, updatedHabit);
+
+      if (isCompleted) {
+        await NotificationService().cancelHabitReminder(habit.id);
+      } else {
+        await NotificationService().scheduleHabitReminder(updatedHabit);
+      }
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
@@ -118,6 +127,7 @@ class HabitNotifier extends StateNotifier<HabitState> {
   Future<void> deleteHabit(String id) async {
     try {
       await _repository.deleteHabit(_uid, id);
+      await NotificationService().cancelHabitReminder(id);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }

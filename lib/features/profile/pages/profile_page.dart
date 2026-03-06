@@ -4,6 +4,7 @@ import '../../../core/constants/app_color.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/wave_clipper.dart';
 import '../../../core/providers/theme_provider.dart';
+import '../../../core/providers/notification_settings_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/profile_controller.dart';
 
@@ -423,6 +424,62 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                   .setTheme(newValue);
                             }
                           },
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Notification Settings Section
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: isDark
+                                  ? AppColors.neutral700
+                                  : AppColors.primary500,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 16,
+                                  top: 16,
+                                  bottom: 8,
+                                ),
+                                child: Text(
+                                  'Notifications',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary600,
+                                  ),
+                                ),
+                              ),
+                              Consumer(
+                                builder: (context, ref, child) {
+                                  final notifSettings = ref.watch(
+                                    notificationSettingsProvider,
+                                  );
+                                  return SwitchListTile(
+                                    title: const Text('Daily Reminders'),
+                                    subtitle: const Text(
+                                      'Remind me to check my habits',
+                                    ),
+                                    value: notifSettings.isEnabled,
+                                    activeThumbColor: AppColors.primary500,
+                                    onChanged: (value) {
+                                      ref
+                                          .read(
+                                            notificationSettingsProvider
+                                                .notifier,
+                                          )
+                                          .updateSettings(isEnabled: value);
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 32),
 

@@ -18,10 +18,16 @@ void main() async {
 
   final sharedPreferences = await SharedPreferences.getInstance();
 
-  // Initialize notifications and schedule daily reminder at 9:00 AM
+  // Initialize notifications and settings
   final notificationService = NotificationService();
   await notificationService.init();
-  await notificationService.scheduleDailyReminder(hour: 9, minute: 0);
+
+  final isNotificationEnabled =
+      sharedPreferences.getBool('notification_enabled') ?? true;
+
+  if (isNotificationEnabled) {
+    await notificationService.requestPermissions();
+  }
 
   runApp(
     ProviderScope(

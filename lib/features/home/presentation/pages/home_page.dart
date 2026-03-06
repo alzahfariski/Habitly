@@ -76,23 +76,23 @@ class HomePage extends ConsumerWidget {
         backgroundColor: AppColors.primary500,
         child: const Icon(Icons.add),
       ),
-      body: Column(
-        children: [
-          const HomeHeader(),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const HomeHeader(),
 
-          HorizontalCalendar(
-            selectedDate: selectedDate,
-            onDateSelected: (date) {
-              ref.read(selectedDateProvider.notifier).state = date;
-            },
-          ),
+            HorizontalCalendar(
+              selectedDate: selectedDate,
+              onDateSelected: (date) {
+                ref.read(selectedDateProvider.notifier).state = date;
+              },
+            ),
 
-          const SizedBox(height: 16),
-          const HabitProgressChart(),
-          const SizedBox(height: 8),
+            const SizedBox(height: 16),
+            const HabitProgressChart(),
+            const SizedBox(height: 8),
 
-          Expanded(
-            child: Container(
+            Container(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -258,11 +258,13 @@ class HomePage extends ConsumerWidget {
                   const SizedBox(height: 16),
 
                   if (habitState.isLoading)
-                    const Expanded(
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 40),
                       child: Center(child: CircularProgressIndicator()),
                     )
                   else if (filteredHabits.isEmpty)
-                    Expanded(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 40),
                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -288,35 +290,32 @@ class HomePage extends ConsumerWidget {
                       ),
                     )
                   else
-                    Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(0),
-                        itemCount: filteredHabits.length,
-                        itemBuilder: (context, index) {
-                          final habit = filteredHabits[index];
-                          return HabitCard(
-                            habit: habit,
-                            onEdit: () => _showHabitSheet(
-                              context,
-                              ref,
-                              habitToEdit: habit,
-                            ),
-                            onDelete: () =>
-                                _deleteHabit(context, ref, habit.id),
-                            onHighlight: (val) {
-                              ref
-                                  .read(habitProvider.notifier)
-                                  .toggleHabitCompletion(habit, val ?? false);
-                            },
-                          );
-                        },
-                      ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(0),
+                      itemCount: filteredHabits.length,
+                      itemBuilder: (context, index) {
+                        final habit = filteredHabits[index];
+                        return HabitCard(
+                          habit: habit,
+                          onEdit: () =>
+                              _showHabitSheet(context, ref, habitToEdit: habit),
+                          onDelete: () => _deleteHabit(context, ref, habit.id),
+                          onHighlight: (val) {
+                            ref
+                                .read(habitProvider.notifier)
+                                .toggleHabitCompletion(habit, val ?? false);
+                          },
+                        );
+                      },
                     ),
                 ],
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 140),
+          ],
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:habitly/features/home/domain/entities/habit_entity.dart';
@@ -55,6 +56,9 @@ void main() {
         // Verify that the data source was called once
         verify(mockDataSource.addHabit(tUid, any)).called(1);
         verifyNoMoreInteractions(mockDataSource);
+        debugPrint(
+          '✅ [Data Test] HabitRepositoryImpl correctly routes addHabit to RemoteDataSource',
+        );
       },
     );
   });

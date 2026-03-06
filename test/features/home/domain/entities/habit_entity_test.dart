@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:habitly/features/home/domain/entities/habit_entity.dart';
 
@@ -15,6 +16,9 @@ void main() {
       );
 
       expect(habit.status, HabitStatus.completed);
+      debugPrint(
+        '✅ [Domain Test] isCompleted=true correctly returns HabitStatus.completed',
+      );
     });
 
     test('should return HabitStatus.ongoing if the date is in the past', () {
@@ -30,6 +34,9 @@ void main() {
       );
 
       expect(habit.status, HabitStatus.ongoing);
+      debugPrint(
+        '✅ [Domain Test] Past date correctly returns HabitStatus.ongoing',
+      );
     });
 
     test('should return HabitStatus.upcoming if the date is in the future', () {
@@ -45,6 +52,9 @@ void main() {
       );
 
       expect(habit.status, HabitStatus.upcoming);
+      debugPrint(
+        '✅ [Domain Test] Future date correctly returns HabitStatus.upcoming',
+      );
     });
   });
 }

@@ -23,10 +23,7 @@ class HabitEntity extends Equatable {
     this.completedAt,
   });
 
-  HabitStatus get status {
-    if (isCompleted) return HabitStatus.completed;
-
-    final now = DateTime.now();
+  DateTime get targetDateTime {
     int hour = 0;
     int minute = 0;
 
@@ -47,6 +44,13 @@ class HabitEntity extends Equatable {
       // Fallback
     }
 
+    return DateTime(date.year, date.month, date.day, hour, minute);
+  }
+
+  HabitStatus get status {
+    if (isCompleted) return HabitStatus.completed;
+
+    final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final habitDateOnly = DateTime(date.year, date.month, date.day);
 
@@ -56,13 +60,7 @@ class HabitEntity extends Equatable {
       return HabitStatus.upcoming; // Future habits are upcoming
     }
 
-    final habitDateTime = DateTime(
-      date.year,
-      date.month,
-      date.day,
-      hour,
-      minute,
-    );
+    final habitDateTime = targetDateTime;
 
     if (habitDateTime.isAfter(now)) {
       return HabitStatus.upcoming;

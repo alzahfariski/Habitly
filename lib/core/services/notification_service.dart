@@ -1,6 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../features/home/domain/entities/habit_entity.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -36,45 +38,62 @@ class NotificationService {
     );
   }
 
-  Future<void> scheduleDailyReminder({
-    required int hour,
-    required int minute,
-  }) async {
-    await _notificationsPlugin.cancel(id: 0);
+  Future<void> requestPermissions() async {
+    await _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.requestNotificationsPermission();
+
+    await _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
+  }
+
+  Future<void> cancelAll() async {
+    await _notificationsPlugin.cancelAll();
+  }
+
+  Future<void> cancelHabitReminder(String habitId) async {
+    await _notificationsPlugin.cancel(id: habitId.hashCode);
+  }
+
+  Future<void> scheduleHabitReminder(HabitEntity habit) async {
+    final prefs = await SharedPreferences.getInstance();
+    final isEnabled = prefs.getBool('notification_enabled') ?? true;
+
+    // Only schedule if globally enabled and the habit is not completed
+    if (!isEnabled || habit.isCompleted) {
+      await cancelHabitReminder(habit.id);
+      return;
+    }
+
+    final scheduledDate = tz.TZDateTime.from(habit.targetDateTime, tz.local);
+
+    // Don't schedule if the time has already passed
+    if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) {
+      await cancelHabitReminder(habit.id);
+      return;
+    }
 
     await _notificationsPlugin.zonedSchedule(
-      id: 0,
+      id: habit.id.hashCode,
       title: 'Habitly Reminder 🎯',
-      body: 'Time to check your habits for today! Keep up the good work.',
-      scheduledDate: _nextInstanceOfTime(hour, minute),
+      body: 'Time for your habit: ${habit.title}!',
+      scheduledDate: scheduledDate,
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
-          'daily_reminder_channel',
-          'Daily Reminder',
-          channelDescription: 'Reminds you daily to complete your habits',
+          'habit_reminder_channel',
+          'Habit Reminders',
+          channelDescription: 'Reminds you to complete your specific habits',
           importance: Importance.max,
           priority: Priority.high,
         ),
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
     );
-  }
-
-  tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
-    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
-    );
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
-    }
-    return scheduledDate;
   }
 }
