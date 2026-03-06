@@ -2,24 +2,32 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:uuid/uuid.dart';
-import '../../../core/services/firestore_service.dart';
-import '../../auth/providers/auth_provider.dart';
-import '../models/habit_model.dart';
+import '../../../auth/providers/auth_provider.dart';
+import '../../domain/entities/habit_entity.dart';
+import '../../domain/repositories/habit_repository.dart';
+import '../../data/datasources/habit_remote_data_source.dart';
+import '../../data/repositories/habit_repository_impl.dart';
 
-/// Singleton instance of FirestoreService
-final firestoreServiceProvider = Provider<FirestoreService>((ref) {
-  return FirestoreService();
+/// Provider for the remote data source
+final habitRemoteDataSourceProvider = Provider<HabitRemoteDataSource>((ref) {
+  return HabitRemoteDataSourceImpl();
+});
+
+/// Provider for the repository
+final habitRepositoryProvider = Provider<HabitRepository>((ref) {
+  final remoteDataSource = ref.watch(habitRemoteDataSourceProvider);
+  return HabitRepositoryImpl(remoteDataSource: remoteDataSource);
 });
 
 class HabitState {
-  final List<HabitModel> habits;
+  final List<HabitEntity> habits;
   final bool isLoading;
   final String? error;
 
   HabitState({this.habits = const [], this.isLoading = false, this.error});
 
   HabitState copyWith({
-    List<HabitModel>? habits,
+    List<HabitEntity>? habits,
     bool? isLoading,
     String? error,
   }) {
@@ -31,13 +39,13 @@ class HabitState {
   }
 }
 
-/// Notifier class to manage the habit state using Firestore
+/// Notifier class to manage the habit state using the Repository
 class HabitNotifier extends StateNotifier<HabitState> {
-  final FirestoreService _firestoreService;
+  final HabitRepository _repository;
   final String _uid;
   StreamSubscription? _subscription;
 
-  HabitNotifier(this._firestoreService, this._uid) : super(HabitState()) {
+  HabitNotifier(this._repository, this._uid) : super(HabitState()) {
     _listenToHabits();
   }
 
@@ -48,7 +56,7 @@ class HabitNotifier extends StateNotifier<HabitState> {
     }
 
     state = state.copyWith(isLoading: true);
-    _subscription = _firestoreService
+    _subscription = _repository
         .getHabitsStream(_uid)
         .listen(
           (habits) {
@@ -60,9 +68,9 @@ class HabitNotifier extends StateNotifier<HabitState> {
         );
   }
 
-  Future<void> addHabit(HabitModel habit) async {
+  Future<void> addHabit(HabitEntity habit) async {
     try {
-      final newHabit = HabitModel(
+      final newHabit = HabitEntity(
         id: const Uuid().v4(),
         title: habit.title,
         description: habit.description,
@@ -72,24 +80,26 @@ class HabitNotifier extends StateNotifier<HabitState> {
         isCompleted: habit.isCompleted,
         completedAt: habit.completedAt,
       );
-      await _firestoreService.addHabit(_uid, newHabit);
-      // No need to manually update state — Firestore stream will handle it
+      await _repository.addHabit(_uid, newHabit);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
   }
 
-  Future<void> updateHabit(HabitModel habit) async {
+  Future<void> updateHabit(HabitEntity habit) async {
     try {
-      await _firestoreService.updateHabit(_uid, habit);
+      await _repository.updateHabit(_uid, habit);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
   }
 
-  Future<void> toggleHabitCompletion(HabitModel habit, bool isCompleted) async {
+  Future<void> toggleHabitCompletion(
+    HabitEntity habit,
+    bool isCompleted,
+  ) async {
     try {
-      final updatedHabit = HabitModel(
+      final updatedHabit = HabitEntity(
         id: habit.id,
         title: habit.title,
         description: habit.description,
@@ -99,7 +109,7 @@ class HabitNotifier extends StateNotifier<HabitState> {
         isCompleted: isCompleted,
         completedAt: isCompleted ? DateTime.now() : null,
       );
-      await _firestoreService.updateHabit(_uid, updatedHabit);
+      await _repository.updateHabit(_uid, updatedHabit);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
@@ -107,7 +117,7 @@ class HabitNotifier extends StateNotifier<HabitState> {
 
   Future<void> deleteHabit(String id) async {
     try {
-      await _firestoreService.deleteHabit(_uid, id);
+      await _repository.deleteHabit(_uid, id);
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
@@ -120,12 +130,12 @@ class HabitNotifier extends StateNotifier<HabitState> {
   }
 }
 
-/// Habit provider that depends on the authenticated user's UID
+/// Habit provider that depends on the authenticated user's UID and the repository
 final habitProvider = StateNotifierProvider<HabitNotifier, HabitState>((ref) {
   final authState = ref.watch(authStateProvider);
   final uid = authState.value?.uid ?? '';
-  final firestoreService = ref.watch(firestoreServiceProvider);
-  return HabitNotifier(firestoreService, uid);
+  final repository = ref.watch(habitRepositoryProvider);
+  return HabitNotifier(repository, uid);
 });
 
 final selectedDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
@@ -139,7 +149,7 @@ final habitSortProvider = StateProvider<HabitSortConfig>(
   (ref) => HabitSortConfig.timeAsc,
 );
 
-final filteredHabitsProvider = Provider<List<HabitModel>>((ref) {
+final filteredHabitsProvider = Provider<List<HabitEntity>>((ref) {
   final habitState = ref.watch(habitProvider);
   final selectedDate = ref.watch(selectedDateProvider);
   final filter = ref.watch(habitFilterProvider);

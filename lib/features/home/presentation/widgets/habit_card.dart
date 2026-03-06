@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../models/habit_model.dart';
-import '../../../core/constants/app_color.dart';
+import '../../domain/entities/habit_entity.dart';
+import '../../../../core/constants/app_color.dart';
 
 class HabitCard extends StatelessWidget {
-  final HabitModel habit;
+  final HabitEntity habit;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final ValueChanged<bool?> onHighlight;

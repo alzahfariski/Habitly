@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_color.dart';
-import '../../../core/widgets/app_button.dart';
-import '../models/habit_model.dart';
+import '../../../../core/constants/app_color.dart';
+import '../../../../core/widgets/app_button.dart';
+import '../../domain/entities/habit_entity.dart';
 
 class AddHabitSheet extends StatefulWidget {
-  final Function(HabitModel) onSave;
+  final Function(HabitEntity) onSave;
   final DateTime initialDate;
-  final HabitModel? existingHabit;
+  final HabitEntity? existingHabit;
 
   const AddHabitSheet({
     super.key,
@@ -257,7 +257,7 @@ class _AddHabitSheetState extends State<AddHabitSheet> {
             onPressed: () {
               if (_titleController.text.isNotEmpty) {
                 widget.onSave(
-                  HabitModel(
+                  HabitEntity(
                     id: widget.existingHabit?.id ?? DateTime.now().toString(),
                     title: _titleController.text,
                     description: '',

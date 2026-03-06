@@ -6,7 +6,7 @@ import '../core/providers/theme_provider.dart';
 import '../features/auth/pages/login_page.dart';
 import '../features/auth/pages/register_page.dart';
 import '../features/auth/providers/auth_provider.dart';
-import '../features/home/pages/home_page.dart';
+import '../features/home/presentation/pages/home_page.dart';
 import '../features/intro/pages/start_page.dart';
 
 import '../features/profile/pages/profile_page.dart';

@@ -1,18 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 
 enum HabitStatus { all, upcoming, ongoing, completed }
 
-class HabitModel {
+class HabitEntity extends Equatable {
   final String id;
-  String title;
-  String description;
-  bool isCompleted;
-  String category;
-  DateTime date;
-  String time;
-  DateTime? completedAt;
+  final String title;
+  final String description;
+  final bool isCompleted;
+  final String category;
+  final DateTime date;
+  final String time;
+  final DateTime? completedAt;
 
-  HabitModel({
+  const HabitEntity({
     required this.id,
     required this.title,
     required this.description,
@@ -71,32 +71,15 @@ class HabitModel {
     }
   }
 
-  /// Convert to Firestore-compatible map
-  Map<String, dynamic> toMap() {
-    return {
-      'title': title,
-      'description': description,
-      'isCompleted': isCompleted,
-      'category': category,
-      'date': Timestamp.fromDate(date),
-      'time': time,
-      'completedAt': completedAt != null
-          ? Timestamp.fromDate(completedAt!)
-          : null,
-    };
-  }
-
-  /// Create HabitModel from Firestore document
-  factory HabitModel.fromMap(Map<String, dynamic> map, String id) {
-    return HabitModel(
-      id: id,
-      title: map['title'] as String? ?? '',
-      description: map['description'] as String? ?? '',
-      isCompleted: map['isCompleted'] as bool? ?? false,
-      category: map['category'] as String? ?? '',
-      date: (map['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      time: map['time'] as String? ?? '',
-      completedAt: (map['completedAt'] as Timestamp?)?.toDate(),
-    );
-  }
+  @override
+  List<Object?> get props => [
+    id,
+    title,
+    description,
+    isCompleted,
+    category,
+    date,
+    time,
+    completedAt,
+  ];
 }

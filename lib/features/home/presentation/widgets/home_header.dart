@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/constants/app_color.dart';
-import '../../../core/constants/app_routes.dart';
-import '../../../core/widgets/wave_clipper.dart';
-import '../../auth/providers/auth_provider.dart';
+import '../../../../core/constants/app_color.dart';
+import '../../../../core/constants/app_routes.dart';
+import '../../../../core/widgets/wave_clipper.dart';
+import '../../../auth/providers/auth_provider.dart';
 
 class HomeHeader extends ConsumerWidget {
   const HomeHeader({super.key});

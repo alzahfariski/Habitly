@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/constants/app_color.dart';
-import '../models/habit_model.dart';
+import '../../../../core/constants/app_color.dart';
+import '../../domain/entities/habit_entity.dart';
 import '../widgets/add_habit_sheet.dart';
 import '../widgets/habit_card.dart';
 import '../widgets/home_header.dart';
 import '../widgets/horizontal_calendar.dart';
 import '../providers/habit_provider.dart';
-import '../../../core/widgets/confirm_dialog.dart';
+import '../widgets/habit_progress_chart.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -28,7 +29,7 @@ class HomePage extends ConsumerWidget {
   void _showHabitSheet(
     BuildContext context,
     WidgetRef ref, {
-    HabitModel? habitToEdit,
+    HabitEntity? habitToEdit,
   }) {
     final selectedDate = ref.read(selectedDateProvider);
     showModalBottomSheet(
@@ -86,7 +87,9 @@ class HomePage extends ConsumerWidget {
             },
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
+          const HabitProgressChart(),
+          const SizedBox(height: 8),
 
           Expanded(
             child: Container(

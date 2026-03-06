@@ -1,14 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../features/home/models/habit_model.dart';
+import '../models/habit_model.dart';
 
-class FirestoreService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+abstract class HabitRemoteDataSource {
+  Stream<List<HabitModel>> getHabitsStream(String uid);
+  Future<void> addHabit(String uid, HabitModel habit);
+  Future<void> updateHabit(String uid, HabitModel habit);
+  Future<void> deleteHabit(String uid, String habitId);
+}
+
+class HabitRemoteDataSourceImpl implements HabitRemoteDataSource {
+  final FirebaseFirestore _firestore;
+
+  HabitRemoteDataSourceImpl({FirebaseFirestore? firestore})
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> _habitsCollection(String uid) {
     return _firestore.collection('users').doc(uid).collection('habits');
   }
 
-  /// Returns a real-time stream of habits for the given user
+  @override
   Stream<List<HabitModel>> getHabitsStream(String uid) {
     return _habitsCollection(
       uid,
@@ -19,17 +29,17 @@ class FirestoreService {
     });
   }
 
-  /// Add a new habit
+  @override
   Future<void> addHabit(String uid, HabitModel habit) async {
     await _habitsCollection(uid).doc(habit.id).set(habit.toMap());
   }
 
-  /// Update an existing habit
+  @override
   Future<void> updateHabit(String uid, HabitModel habit) async {
     await _habitsCollection(uid).doc(habit.id).update(habit.toMap());
   }
 
-  /// Delete a habit by ID
+  @override
   Future<void> deleteHabit(String uid, String habitId) async {
     await _habitsCollection(uid).doc(habitId).delete();
   }
