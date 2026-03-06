@@ -39,19 +39,20 @@ Habitly is a modern, elegant habit tracking application built with Flutter. It t
 - **Language**: Dart
 - **Architecture**: Feature-based folder structure
 - **State Management**: Riverpod (StateNotifier & Provider)
-- **Local Database**: Hive (NoSQL)
+- **Local Storage**: Shared Preferences
 - **Backend**: Firebase (Authentication & Firestore)
+- **Core Features**: Local Notifications & Analytics Charts
 - **Assets**: Custom SVGs & Images
 
 ## 🏗 Architecture & State Management
 
-### 📦 Hive (Local Database)
+### ☁️ Firebase Firestore & Local Storage
 
-We use **Hive** for fast, lightweight, and secure local data storage.
+We use **Firebase** for cloud data synchronization and **Shared Preferences** for lightweight local storage like user settings.
 
-- **Service**: `HiveService` (`lib/core/services/hive_service.dart`) handles all database operations.
-- **Data Model**: `HabitModel` is adapted using `TypeAdapter` to store custom objects directly.
-- **Box**: A dedicated box named `habits` stores all the user's habit data, persisting it across app restarts.
+- **Authentication**: `AuthService` (`lib/core/services/auth_service.dart`) handles secure user login and registration.
+- **Data Model**: `HabitEntity` maps to Firestore documents allowing real-time sync across devices.
+- **Notifications**: `NotificationService` handles local reminders for upcoming habits.
 
 ### 🦋 Riverpod (State Management)
 
